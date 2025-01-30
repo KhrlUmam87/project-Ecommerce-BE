@@ -1,0 +1,190 @@
+ini progam saya yang ada raja ongkirnya
+
+config/connection.js
+import mongoose from "mongoose"
+
+const connect = async (req, res) => {
+  try {
+    const connection = await mongoose.connect(process.env.URL)
+    console.log(`Connection to ${connection.connection.host}`)
+  } catch (error) {
+    console.log(`Error = ${error.message}`)
+
+    process.exit(1)
+  }
+}
+
+export default connect
+
+server.js
+import "dotenv/config"
+import app from "./app.js"
+import connect from "./config/connection.js"
+
+connect()
+
+app.get("/", (req, res) => {
+  res.send("Server Okee")
+})
+
+const port = 2000;
+
+app.listen(port, () => {
+  console.log("Server berjalan ke port : " + port)
+})
+
+app.js
+import bodyParser from "body-parser"
+import express from "express"
+import cors from "cors"
+import cookieParser from "cookie-parser"
+import session from "express-session"
+import passport from "passport"
+
+// import UserRouter from "./router/UserRouter.js"
+// import User from "./models/User.js"
+
+const app = express()
+app.use(cors())
+app.use(cookieParser())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.json())
+
+// app.use(
+//   session({
+//     secret: process.env.KEY,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: false,
+//       httpOnly: true,
+//       maxAge: 60 * 60 * 1000,
+//     },
+//   })
+// )
+
+// app.use(passport.initialize())
+// app.use(passport.session())
+
+// passport.use(User.createStrategy())
+
+// passport.serializeUser(User.serializeUser())
+// passport.deserializeUser(User.deserializeUser())
+
+// app.use("/user", UserRouter)
+
+export default app
+
+package.json
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "backend umam",
+  "license": "ISC",
+  "author": "khrlumam",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "fs": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
+    "midtrans-client": "^1.4.2",
+    "mongoose": "^8.9.5",
+    "multer": "^1.4.5-lts.1",
+    "node-rajaongkir": "^1.1.0",
+    "nodemailer": "^6.9.16",
+    "nodemon": "^3.1.9",
+    "passport": "^0.7.0",
+    "passport-google-oauth2": "^0.2.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^8.0.0"
+  },
+  "type": "module"
+}
+
+App.js
+import bodyParser from "body-parser"
+import express from "express"
+import cors from "cors"
+import cookieParser from "cookie-parser"
+import session from "express-session"
+import passport from "passport"
+import User from "./models/User.js"
+
+import UserRoutes from "./routes/UserRoutes.js"
+import productsRoutes from "./routes/ProductRoutes.js"
+import cartRoutes from "./routes/CartRoates.js"
+import ShippingRoutes from "./routes/ShippingRoutes.js"
+
+const app = express()
+app.use(cors())
+app.use(cookieParser())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.json())
+
+app.use(
+  session({
+    secret: process.env.KEY,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 60 * 60 * 1000,
+    },
+  })
+)
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+passport.use(User.createStrategy())
+
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
+
+app.use("/User", UserRoutes)
+app.use("/products", productsRoutes)
+app.use("/cart", cartRoutes)
+app.use("/shipping", ShippingRoutes)
+export default app
+
+
+ShippingRoutes.js
+
+import express from "express"
+import { authenticate } from "../middleware/authenticate.js"
+import axios from "axios"
+import dotenv from "dotenv"
+dotenv.config()
+
+axios.defaults.baseURL = process.env.BASE_URL
+axios.defaults.headers.common["key"] = process.env.KEY
+axios.defaults.headers.post["Content-Type"] =
+  "Application/x-www-form-urlencoded"
+
+const router = express.Router()
+
+router.get("/provinces", authenticate(["user"]), async (req, res) => {
+  try {
+    const pronvices = await axios.get("/province")
+    res.status(200).json(pronvices.data.rajaongkir.results)
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: error.message })
+  }
+})
+export default router
+
+
+saya ingin mengubah raja ongkir menjadi api ongkir

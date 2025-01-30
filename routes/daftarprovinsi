@@ -1,0 +1,16 @@
+const myHeaders = new Headers()
+myHeaders.append("x-api-key", "cIATSQvQ41872265995e2270iNgzTJbH")
+
+const requestOptions = {
+  method: "GET",
+  headers: myHeaders,
+  redirect: "follow",
+}
+
+fetch(
+  "https://api-sandbox.collaborator.komerce.id/tariff/api/v1/destination/search?keyword=53131",
+  requestOptions
+)
+  .then((response) => response.text())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error))
